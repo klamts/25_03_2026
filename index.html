@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🩹 Complete the Sentences! 🩹</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg1: #ffecd2; --bg2: #fcb69f; --bg3: #a1c4fd; --bg4: #c2e9fb;
+  --red: #e63946; --orange: #f4a261; --teal: #2a9d8f;
+  --blue: #457b9d; --navy: #1d3557; --yellow: #ffd166;
+  --green: #06d6a0; --pink: #ef476f; --purple: #7b2d8b;
+  --white: #ffffff; --card: rgba(255,255,255,0.93);
+  --shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(160deg, #ffecd2 0%, #fcb69f 30%, #a1c4fd 70%, #c2e9fb 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated blobs background */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.25;
+  animation: blobMove 10s infinite ease-in-out alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+.blob1 { width:340px;height:340px;background:#fcb69f;top:-80px;left:-80px;animation-delay:0s; }
+.blob2 { width:260px;height:260px;background:#a1c4fd;bottom:60px;right:-60px;animation-delay:2s; }
+.blob3 { width:200px;height:200px;background:#ffd166;top:40%;left:60%;animation-delay:4s; }
+@keyframes blobMove { 0%{transform:scale(1) translate(0,0);} 100%{transform:scale(1.2) translate(20px,20px);} }
+
+/* Floating emoji */
+.float-emoji { position:fixed;font-size:1.8rem;pointer-events:none;z-index:0;animation:floatUp 7s infinite ease-in-out; opacity:0.3; }
+@keyframes floatUp { 0%,100%{transform:translateY(0) rotate(-8deg);}50%{transform:translateY(-28px) rotate(8deg);} }
+
+/* Layout */
+.page { position:relative;z-index:10;max-width:860px;margin:0 auto;padding:24px 16px 40px; }
+
+/* Header */
+.header { text-align:center; padding:10px 0 28px; }
+.main-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  color: var(--navy);
+  text-shadow: 3px 4px 0 rgba(0,0,0,0.12);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+.main-title span { color: var(--red); }
+.subtitle { color: var(--blue); font-weight:700; font-size:1rem; margin-top:6px; opacity:0.85; }
+
+/* Word bank */
+.wordbank {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow);
+  border: 3px solid var(--yellow);
+  position: relative;
+  overflow: hidden;
+}
+.wordbank::before { content:'📦'; position:absolute;top:10px;right:14px;font-size:2rem;opacity:0.15; }
+.wordbank-title {
+  font-family: 'Baloo 2', cursive;
+  font-size:1.1rem; color:var(--navy); font-weight:800;
+  margin-bottom:12px; text-transform:uppercase; letter-spacing:1.5px;
+}
+.word-chips { display:flex;flex-wrap:wrap;gap:10px; }
+.chip {
+  background: linear-gradient(135deg, var(--blue), var(--teal));
+  color:white; border-radius:50px;
+  padding:7px 18px; font-weight:700; font-size:0.9rem;
+  box-shadow:0 3px 10px rgba(0,0,0,0.15);
+  transition:transform 0.2s;
+  cursor:default;
+}
+.chip:hover { transform:scale(1.07) rotate(-2deg); }
+
+/* Sentence card */
+.s-card {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 22px 24px 18px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s, box-shadow 0.25s;
+  animation: cardSlide 0.5s ease both;
+}
+.s-card:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(0,0,0,0.15); }
+@keyframes cardSlide { from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);} }
+
+.card-accent {
+  position:absolute;top:0;left:0;right:0;height:6px;
+  background: linear-gradient(90deg, var(--red), var(--orange), var(--yellow), var(--green), var(--blue));
+}
+
+.card-top { display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap; }
+.q-number {
+  font-family:'Baloo 2',cursive;
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;font-weight:800;color:white;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+}
+
+.sentence-area { flex:1; }
+.sentence-en {
+  font-size:1.05rem;font-weight:700;color:var(--navy);line-height:1.6;
+  margin-bottom:8px;
+}
+.blank {
+  display:inline-block;
+  background:linear-gradient(135deg,#fff3e0,#ffe0b2);
+  border:2px dashed var(--orange);
+  border-radius:8px;
+  padding:2px 12px;
+  min-width:80px;
+  color:var(--red);
+  font-weight:800;
+  font-style:normal;
+  font-size:1rem;
+}
+.answer-revealed .blank {
+  background:linear-gradient(135deg,#e8f5e9,#c8e6c9);
+  border-color:var(--green);
+  color:#2e7d32;
+  animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn { 0%{transform:scale(0.5);}100%{transform:scale(1);} }
+
+.sentence-vn {
+  font-size:0.9rem;color:#555;font-style:italic;
+  margin-top:4px;
+  display:none;
+  animation:fadeIn 0.3s ease;
+}
+.sentence-vn.show { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);} }
+
+/* Image illustration */
+.img-box {
+  width:130px;height:110px;border-radius:16px;
+  overflow:hidden;flex-shrink:0;
+  border:3px solid rgba(0,0,0,0.08);
+  box-shadow:0 4px 16px rgba(0,0,0,0.12);
+  display:none;position:relative;
+  background:linear-gradient(135deg,#f5f5f5,#e0e0e0);
+}
+.img-box.show { display:flex;align-items:center;justify-content:center; }
+.img-box img { width:100%;height:100%;object-fit:cover;border-radius:13px; }
+.img-fallback {
+  font-size:3.5rem;
+  display:flex;align-items:center;justify-content:center;
+  width:100%;height:100%;
+}
+
+/* Buttons */
+.btn-row { display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;align-items:center; }
+.btn {
+  border:none;border-radius:50px;
+  padding:7px 16px;
+  font-family:'Quicksand',sans-serif;font-size:0.82rem;font-weight:800;
+  cursor:pointer;transition:all 0.2s;
+  display:flex;align-items:center;gap:5px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.12);
+}
+.btn:hover { transform:scale(1.07); }
+.btn:active { transform:scale(0.95); }
+
+.btn-answer { background:linear-gradient(135deg,#06d6a0,#00c853);color:white; }
+.btn-vn { background:linear-gradient(135deg,#ff9800,#ffd54f);color:#1d3557; }
+.btn-img { background:linear-gradient(135deg,#7b2d8b,#c678dd);color:white; }
+.btn-audio {
+  background:linear-gradient(135deg,#457b9d,#1d6fa8);color:white;
+  position:relative;
+}
+.btn-audio.playing {
+  background:linear-gradient(135deg,#ef476f,#f72585);
+  animation:audioPulse 0.6s infinite alternate;
+}
+@keyframes audioPulse { from{transform:scale(1);}to{transform:scale(1.1);} }
+
+.audio-filename { font-size:0.7rem;opacity:0.8; }
+
+/* ===== NOTES SECTION ===== */
+.notes-section { margin-top:32px; }
+.notes-toggle-btn {
+  background:linear-gradient(135deg,#1d3557,#457b9d);
+  color:white;border:none;border-radius:16px;
+  padding:14px 28px;font-size:1rem;font-weight:800;
+  font-family:'Baloo 2',cursive;
+  cursor:pointer;width:100%;text-align:left;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 6px 20px rgba(29,53,87,0.3);
+  transition:all 0.2s;
+}
+.notes-toggle-btn:hover { transform:translateY(-2px); }
+
+.notes-body {
+  display:none;
+  background:rgba(255,255,255,0.96);
+  border-radius:0 0 20px 20px;
+  padding:24px 26px;
+  border:3px solid #1d3557;border-top:none;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+  animation:cardSlide 0.4s ease;
+}
+.notes-body.open { display:block; }
+
+.notes-title {
+  font-family:'Baloo 2',cursive;
+  font-size:1.4rem;color:var(--navy);
+  margin-bottom:18px;
+  display:flex;align-items:center;gap:8px;
+}
+
+.phrase-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px; }
+
+.phrase-card {
+  background:white;border-radius:14px;
+  padding:14px 16px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.07);
+  border-left:5px solid var(--teal);
+  transition:transform 0.2s;
+}
+.phrase-card:hover { transform:translateX(4px); }
+.phrase-card:nth-child(3n+1) { border-left-color:var(--red); }
+.phrase-card:nth-child(3n+2) { border-left-color:var(--blue); }
+.phrase-card:nth-child(3n) { border-left-color:var(--green); }
+.phrase-card:nth-child(3n+4) { border-left-color:var(--orange); }
+.phrase-card:nth-child(3n+5) { border-left-color:var(--purple); }
+
+.phrase-en { font-weight:800;color:var(--navy);font-size:0.95rem;margin-bottom:3px; }
+.phrase-vn { color:#555;font-size:0.85rem;font-style:italic; }
+.phrase-ex { background:#f8f9fa;border-radius:8px;padding:6px 10px;margin-top:7px;font-size:0.83rem;color:#333;font-weight:600; }
+
+.notes-audio-row { display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding-top:16px;border-top:2px dashed #e0e0e0; }
+
+/* Score bar */
+.score-bar {
+  background:rgba(255,255,255,0.9);
+  border-radius:50px;padding:10px 22px;
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:22px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.1);
+  flex-wrap:wrap;justify-content:center;
+}
+.score-label { font-weight:800;color:var(--navy);font-size:0.9rem; }
+.score-stars { font-size:1.4rem;letter-spacing:2px; }
+
+/* Global controls */
+.global-bar {
+  display:flex;flex-wrap:wrap;gap:8px;
+  justify-content:center;margin-bottom:22px;
+}
+.btn-global { font-size:0.85rem;padding:9px 20px; }
+.btn-show-all { background:linear-gradient(135deg,var(--green),#00c853);color:white; }
+.btn-hide-all { background:linear-gradient(135deg,#e0e0e0,#bdbdbd);color:#333; }
+.btn-vn-all { background:linear-gradient(135deg,#ff9800,#ff5722);color:white; }
+.btn-img-all { background:linear-gradient(135deg,var(--purple),#c678dd);color:white; }
+
+@media(max-width:600px){
+  .img-box { width:90px;height:80px; }
+  .card-top { flex-direction:column; }
+  .img-box { width:100%;height:120px; }
+  .phrase-grid { grid-template-columns:1fr; }
+}
+/* ===== CHAT STYLE OVERRIDE ===== */
+
+/* mỗi dòng thành chat */
+.qa-row {
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Person 1 → bên phải */
+.qa-row:has(.av-p1) {
+  justify-content: flex-end;
+}
+
+/* Person 2 → bên trái */
+.qa-row:has(.av-p2) {
+  justify-content: flex-start;
+}
+
+/* đảo vị trí avatar cho bên phải */
+.qa-row:has(.av-p1) .qa-avatar {
+  order: 2;
+}
+
+/* bubble */
+.qa-content {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: #ffffff;
+  position: relative;
+  animation: fadeUp .3s ease;
+}
+
+/* bubble bên phải */
+.qa-row:has(.av-p1) .qa-content {
+  background: linear-gradient(135deg, #6ec1ff, #a8e6ff);
+color: #0b3c5d;
+}
+
+/* bubble bên trái */
+.qa-row:has(.av-p2) .qa-content {
+  background: #e5e5e6;
+}
+
+/* ẩn role cho giống chat */
+.qa-role {
+  display: none;
+}
+
+/* VN nhỏ hơn */
+.qa-vn {
+  font-size: 12px;
+  opacity: 0.8;
+}
+</style>
+</head>
+<body>
+
+<!-- Background blobs -->
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
+<!-- Floating emojis -->
+<script>
+const floatEmojis = ['🩹','🏥','💊','🩺','❤️','⭐','🌟','🎈','🏃'];
+floatEmojis.forEach((e,i) => {
+  const d = document.createElement('div');
+  d.className = 'float-emoji';
+  d.textContent = e;
+  d.style.left = (8 + i*11) + '%';
+  d.style.top = (10 + Math.random()*70) + '%';
+  d.style.animationDelay = (i*0.8) + 's';
+  d.style.animationDuration = (5 + Math.random()*4) + 's';
+  document.body.appendChild(d);
+});
+</script>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="main-title">🩹 Complete the <span>Sentences!</span> 🏥</div>
+    <div class="subtitle">Điền từ đúng vào chỗ trống – Injuries & Body Problems</div>
+  </div>
+
+  <!-- Word Bank -->
+  <div class="wordbank">
+    <div class="wordbank-title">📦 Word Bank – Từ Vựng</div>
+    <div class="word-chips">
+      <div class="chip">a broken arm</div>
+      <div class="chip">a broken leg</div>
+      <div class="chip">a bruise</div>
+      <div class="chip">a burn</div>
+      <div class="chip">a cut</div>
+      <div class="chip">a scratch</div>
+    </div>
+  </div>
+
+  <!-- Score bar -->
+  <div class="score-bar">
+    <span class="score-label">⭐ Revealed:</span>
+    <span class="score-stars" id="scoreStars">☆☆☆☆☆☆</span>
+    <span class="score-label" id="scoreCount">0 / 6</span>
+  </div>
+
+  <!-- Global controls -->
+  <div class="global-bar">
+    <button class="btn btn-global btn-show-all" onclick="showAllAnswers()">👁️ Show All</button>
+    <button class="btn btn-global btn-hide-all" onclick="hideAllAnswers()">🙈 Hide All</button>
+    <button class="btn btn-global btn-vn-all" onclick="toggleAllVN()">🇻🇳 VN All</button>
+    <button class="btn btn-global btn-img-all" onclick="toggleAllImg()">🖼️ Images All</button>
+  </div>
+
+  <!-- ===== SENTENCES ===== -->
+
+  <!-- S1 -->
+  <div class="s-card" id="card-1" style="animation-delay:0.05s">
+    <div class="card-accent"></div>
+    <div class="card-top">
+      <div class="q-number" style="background:linear-gradient(135deg,#e63946,#f4a261)">1</div>
+      <div class="sentence-area">
+        <div class="sentence-en" id="sen-1">
+          Last year my brother fell off his bike. He couldn't walk for weeks because he had
+          <span class="blank" id="blank-1">___________</span>.
+        </div>
+        <div class="sentence-vn" id="vn-1">
+          👉 Năm ngoái anh trai tôi bị ngã khỏi xe đạp. Anh ấy không thể đi bộ trong nhiều tuần vì anh ấy bị <strong>gãy chân</strong>.
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-audio" onclick="playAudio(1, this)">🔊 <span class="audio-filename">1.wav</span></button>
+          <button class="btn btn-answer" onclick="revealAnswer(1, 'a broken leg')">✅ Answer</button>
+          <button class="btn btn-vn" onclick="toggleVN('vn-1')">🇻🇳 Tiếng Việt</button>
+          <button class="btn btn-img" onclick="toggleImg('img-1')">🖼️ Hình</button>
+        </div>
+      </div>
+      <div class="img-box" id="img-1">
+        <div class="img-fallback">🦵🩹</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="s-card" id="card-2" style="animation-delay:0.1s">
+    <div class="card-accent"></div>
+    <div class="card-top">
+      <div class="q-number" style="background:linear-gradient(135deg,#f4a261,#ffd166)">2</div>
+      <div class="sentence-area">
+        <div class="sentence-en" id="sen-2">
+          Mom touched the stove, and she got
+          <span class="blank" id="blank-2">___________</span>
+          on her hand.
+        </div>
+        <div class="sentence-vn" id="vn-2">
+          👉 Mẹ chạm vào bếp và bị <strong>bỏng</strong> ở tay.
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-audio" onclick="playAudio(2, this)">🔊 <span class="audio-filename">2.wav</span></button>
+          <button class="btn btn-answer" onclick="revealAnswer(2, 'a burn')">✅ Answer</button>
+          <button class="btn btn-vn" onclick="toggleVN('vn-2')">🇻🇳 Tiếng Việt</button>
+          <button class="btn btn-img" onclick="toggleImg('img-2')">🖼️ Hình</button>
+        </div>
+      </div>
+      <div class="img-box" id="img-2">
+        <div class="img-fallback">🔥🤚</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="s-card" id="card-3" style="animation-delay:0.15s">
+    <div class="card-accent"></div>
+    <div class="card-top">
+      <div class="q-number" style="background:linear-gradient(135deg,#ffd166,#06d6a0)">3</div>
+      <div class="sentence-area">
+        <div class="sentence-en" id="sen-3">
+          Last night the cat jumped up at my sister. She got
+          <span class="blank" id="blank-3">___________</span>,
+          but it is very small.
+        </div>
+        <div class="sentence-vn" id="vn-3">
+          👉 Tối qua con mèo nhảy vào chị gái tôi. Chị ấy bị <strong>xước da</strong> nhưng rất nhỏ.
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-audio" onclick="playAudio(3, this)">🔊 <span class="audio-filename">3.wav</span></button>
+          <button class="btn btn-answer" onclick="revealAnswer(3, 'a scratch')">✅ Answer</button>
+          <button class="btn btn-vn" onclick="toggleVN('vn-3')">🇻🇳 Tiếng Việt</button>
+          <button class="btn btn-img" onclick="toggleImg('img-3')">🖼️ Hình</button>
+        </div>
+      </div>
+      <div class="img-box" id="img-3">
+        <div class="img-fallback">🐱🐾</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="s-card" id="card-4" style="animation-delay:0.2s">
+    <div class="card-accent"></div>
+    <div class="card-top">
+      <div class="q-number" style="background:linear-gradient(135deg,#06d6a0,#457b9d)">4</div>
+      <div class="sentence-area">
+        <div class="sentence-en" id="sen-4">
+          Our teacher couldn't write on the board for weeks because she had
+          <span class="blank" id="blank-4">___________</span>.
+        </div>
+        <div class="sentence-vn" id="vn-4">
+          👉 Cô giáo chúng tôi không thể viết lên bảng trong nhiều tuần vì cô ấy bị <strong>gãy tay</strong>.
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-audio" onclick="playAudio(4, this)">🔊 <span class="audio-filename">4.wav</span></button>
+          <button class="btn btn-answer" onclick="revealAnswer(4, 'a broken arm')">✅ Answer</button>
+          <button class="btn btn-vn" onclick="toggleVN('vn-4')">🇻🇳 Tiếng Việt</button>
+          <button class="btn btn-img" onclick="toggleImg('img-4')">🖼️ Hình</button>
+        </div>
+      </div>
+      <div class="img-box" id="img-4">
+        <div class="img-fallback">💪🩹</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="s-card" id="card-5" style="animation-delay:0.25s">
+    <div class="card-accent"></div>
+    <div class="card-top">
+      <div class="q-number" style="background:linear-gradient(135deg,#457b9d,#7b2d8b)">5</div>
+      <div class="sentence-area">
+        <div class="sentence-en" id="sen-5">
+          My best friend's knee looks black and blue! He got
+          <span class="blank" id="blank-5">___________</span>
+          when he played soccer!
+        </div>
+        <div class="sentence-vn" id="vn-5">
+          👉 Đầu gối của bạn thân tôi trông đen và xanh! Bạn ấy bị <strong>bầm tím</strong> khi chơi bóng đá!
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-audio" onclick="playAudio(5, this)">🔊 <span class="audio-filename">5.wav</span></button>
+          <button class="btn btn-answer" onclick="revealAnswer(5, 'a bruise')">✅ Answer</button>
+          <button class="btn btn-vn" onclick="toggleVN('vn-5')">🇻🇳 Tiếng Việt</button>
+          <button class="btn btn-img" onclick="toggleImg('img-5')">🖼️ Hình</button>
+        </div>
+      </div>
+      <div class="img-box" id="img-5">
+        <div class="img-fallback">⚽🦵</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="s-card" id="card-6" style="animation-delay:0.3s">
+    <div class="card-accent"></div>
+    <div class="card-top">
+      <div class="q-number" style="background:linear-gradient(135deg,#7b2d8b,#e63946)">6</div>
+      <div class="sentence-area">
+        <div class="sentence-en" id="sen-6">
+          When I was a little kid, I ran with some scissors and fell. I had to see the doctor because I had
+          <span class="blank" id="blank-6">___________</span>
+          on my leg. It really hurt!
+        </div>
+        <div class="sentence-vn" id="vn-6">
+          👉 Khi còn nhỏ, tôi chạy cầm kéo rồi bị ngã. Tôi phải đến gặp bác sĩ vì tôi bị <strong>vết cắt</strong> ở chân. Nó thật sự rất đau!
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-audio" onclick="playAudio(6, this)">🔊 <span class="audio-filename">6.wav</span></button>
+          <button class="btn btn-answer" onclick="revealAnswer(6, 'a cut')">✅ Answer</button>
+          <button class="btn btn-vn" onclick="toggleVN('vn-6')">🇻🇳 Tiếng Việt</button>
+          <button class="btn btn-img" onclick="toggleImg('img-6')">🖼️ Hình</button>
+        </div>
+      </div>
+      <div class="img-box" id="img-6">
+        <div class="img-fallback">✂️🩸</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== NOTES SECTION ===== -->
+  <div class="notes-section">
+    <button class="notes-toggle-btn" onclick="toggleNotes()">
+      <span>📖 Ghi Chú Tổng Hợp Kiến Thức – Key Phrases &amp; Vocabulary</span>
+      <span id="notes-arrow">▼</span>
+    </button>
+    <div class="notes-body" id="notes-body">
+      <div class="notes-title">📚 Tổng Hợp Kiến Thức Qua Bài Tập</div>
+
+      <div class="phrase-grid">
+
+        <div class="phrase-card">
+          <div class="phrase-en">fell off (his bike)</div>
+          <div class="phrase-vn">ngã khỏi (xe đạp)</div>
+          <div class="phrase-ex">He fell off his bike and hurt his leg.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">couldn't walk for weeks</div>
+          <div class="phrase-vn">không thể đi bộ trong nhiều tuần</div>
+          <div class="phrase-ex">He couldn't walk for weeks after the accident.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">had a broken leg</div>
+          <div class="phrase-vn">bị gãy chân</div>
+          <div class="phrase-ex">She had a broken leg and needed a cast.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">touched the stove</div>
+          <div class="phrase-vn">chạm vào bếp (lò)</div>
+          <div class="phrase-ex">Don't touch the stove — it's hot!</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">got a burn</div>
+          <div class="phrase-vn">bị bỏng</div>
+          <div class="phrase-ex">She got a burn on her hand from the stove.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">jumped up at</div>
+          <div class="phrase-vn">nhảy vào / vồ vào</div>
+          <div class="phrase-ex">The cat jumped up at my sister.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">got a scratch</div>
+          <div class="phrase-vn">bị xước da</div>
+          <div class="phrase-ex">It's just a scratch — don't worry!</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">couldn't write on the board</div>
+          <div class="phrase-vn">không thể viết lên bảng</div>
+          <div class="phrase-ex">The teacher couldn't write on the board.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">had a broken arm</div>
+          <div class="phrase-vn">bị gãy tay</div>
+          <div class="phrase-ex">She had a broken arm and wore a sling.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">friend's knee / looks black and blue</div>
+          <div class="phrase-vn">đầu gối bạn / trông đen và xanh (bầm)</div>
+          <div class="phrase-ex">His knee looks black and blue after the fall.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">got a bruise</div>
+          <div class="phrase-vn">bị bầm tím</div>
+          <div class="phrase-ex">He got a bruise when he played soccer.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">a little kid</div>
+          <div class="phrase-vn">một đứa trẻ nhỏ / hồi còn nhỏ</div>
+          <div class="phrase-ex">When I was a little kid, I loved to run.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">ran with some scissors and fell</div>
+          <div class="phrase-vn">chạy cầm kéo rồi bị ngã</div>
+          <div class="phrase-ex">Never run with scissors — it's dangerous!</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">had to see the doctor</div>
+          <div class="phrase-vn">phải đi gặp bác sĩ</div>
+          <div class="phrase-ex">She had to see the doctor right away.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">had a cut</div>
+          <div class="phrase-vn">bị vết cắt / vết thương hở</div>
+          <div class="phrase-ex">He had a cut on his leg that needed stitches.</div>
+        </div>
+
+        <div class="phrase-card">
+          <div class="phrase-en">It really hurt!</div>
+          <div class="phrase-vn">Nó thật sự rất đau!</div>
+          <div class="phrase-ex">Ouch! It really hurt when I fell down.</div>
+        </div>
+
+      </div>
+
+      <!-- Notes audio buttons -->
+      <div class="notes-audio-row">
+        <div style="width:100%;font-weight:800;color:var(--navy);font-size:0.85rem;margin-bottom:4px;">🔊 Nghe audio từng cụm từ:</div>
+        <button class="btn btn-audio" onclick="playAudio(7, this)">🔊 fell off <span class="audio-filename">7.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(8, this)">🔊 couldn't walk <span class="audio-filename">8.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(9, this)">🔊 broken leg <span class="audio-filename">9.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(10, this)">🔊 touched the stove <span class="audio-filename">10.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(11, this)">🔊 got a burn <span class="audio-filename">11.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(12, this)">🔊 jumped up at <span class="audio-filename">12.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(13, this)">🔊 got a scratch <span class="audio-filename">13.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(14, this)">🔊 broken arm <span class="audio-filename">14.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(15, this)">🔊 black and blue <span class="audio-filename">15.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(16, this)">🔊 got a bruise <span class="audio-filename">16.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(17, this)">🔊 a little kid <span class="audio-filename">17.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(18, this)">🔊 ran with scissors <span class="audio-filename">18.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(19, this)">🔊 see the doctor <span class="audio-filename">19.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(20, this)">🔊 had a cut <span class="audio-filename">20.wav</span></button>
+        <button class="btn btn-audio" onclick="playAudio(21, this)">🔊 It really hurt! <span class="audio-filename">21.wav</span></button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .page -->
+
+<script>
+// ====== AUDIO via Web Speech API ======
+const AUDIO_TEXTS = {
+  1: "Last year my brother fell off his bike. He couldn't walk for weeks because he had a broken leg.",
+  2: "Mom touched the stove, and she got a burn on her hand.",
+  3: "Last night the cat jumped up at my sister. She got a scratch, but it is very small.",
+  4: "Our teacher couldn't write on the board for weeks because she had a broken arm.",
+  5: "My best friend's knee looks black and blue! He got a bruise when he played soccer!",
+  6: "When I was a little kid, I ran with some scissors and fell. I had to see the doctor because I had a cut on my leg. It really hurt!",
+  7: "fell off",
+  8: "couldn't walk for weeks",
+  9: "had a broken leg",
+  10: "touched the stove",
+  11: "got a burn",
+  12: "jumped up at",
+  13: "got a scratch",
+  14: "had a broken arm",
+  15: "looks black and blue",
+  16: "got a bruise",
+  17: "a little kid",
+  18: "ran with some scissors and fell",
+  19: "had to see the doctor",
+  20: "had a cut",
+  21: "It really hurt!"
+};
+let currentUtterance = null;
+let currentAudio = null;
+let currentId = null;
+
+function playAudio(id, btn) {
+  const fileName = id + ".wav";
+
+  // 👉 Nếu bấm lại cùng file → pause
+  if (currentAudio && currentId === id) {
+    currentAudio.pause();
+    currentAudio = null;
+    currentId = null;
+    return;
+  }
+
+  // 👉 Nếu đang có file khác → dừng
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+  }
+
+  const audio = new Audio(fileName);
+  currentAudio = audio;
+  currentId = id;
+
+  audio.play();
+
+  audio.onended = () => {
+    currentAudio = null;
+    currentId = null;
+  };
+}
+// let currentUtterance = null;
+// let playingBtn = null;
+
+// function playAudio(num, btn) {
+//   if (currentUtterance) {
+//     window.speechSynthesis.cancel();
+//     if (playingBtn) {
+//       playingBtn.classList.remove('playing');
+//       playingBtn.innerHTML = playingBtn.innerHTML.replace('⏹️','🔊');
+//     }
+//     if (playingBtn === btn) { currentUtterance = null; playingBtn = null; return; }
+//   }
+//   const text = AUDIO_TEXTS[num];
+//   if (!text) return;
+//   const utter = new SpeechSynthesisUtterance(text);
+//   utter.lang = 'en-US'; utter.rate = 0.88; utter.pitch = 1.05;
+//   const voices = window.speechSynthesis.getVoices();
+//   const v = voices.find(v => v.lang==='en-US' && v.name.includes('Google'))
+//     || voices.find(v => v.lang==='en-US') || voices[0];
+//   if (v) utter.voice = v;
+//   currentUtterance = utter; playingBtn = btn;
+//   btn.classList.add('playing');
+//   btn.innerHTML = btn.innerHTML.replace('🔊','⏹️');
+//   utter.onend = utter.onerror = () => {
+//     btn.classList.remove('playing');
+//     btn.innerHTML = btn.innerHTML.replace('⏹️','🔊');
+//     currentUtterance = null; playingBtn = null;
+//   };
+//   window.speechSynthesis.speak(utter);
+// }
+// window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+// window.speechSynthesis.getVoices();
+
+// ====== Answer reveal ======
+const answers = {};
+function revealAnswer(num, ans) {
+  if (answers[num]) return;
+  answers[num] = true;
+  const blank = document.getElementById('blank-' + num);
+  blank.textContent = ans;
+  document.getElementById('card-' + num).classList.add('answer-revealed');
+  updateScore();
+  spawnConfetti(blank);
+}
+
+function showAllAnswers() {
+  const data = {1:'a broken leg',2:'a burn',3:'a scratch',4:'a broken arm',5:'a bruise',6:'a cut'};
+  Object.entries(data).forEach(([n, a]) => revealAnswer(parseInt(n), a));
+}
+
+function hideAllAnswers() {
+  for (let i = 1; i <= 6; i++) {
+    answers[i] = false;
+    document.getElementById('blank-'+i).textContent = '___________';
+    document.getElementById('card-'+i).classList.remove('answer-revealed');
+  }
+  updateScore();
+}
+
+function updateScore() {
+  const count = Object.values(answers).filter(Boolean).length;
+  const stars = '⭐'.repeat(count) + '☆'.repeat(6-count);
+  document.getElementById('scoreStars').textContent = stars;
+  document.getElementById('scoreCount').textContent = count + ' / 6';
+}
+
+// ====== VN toggle ======
+function toggleVN(id) { document.getElementById(id).classList.toggle('show'); }
+let vnAll = false;
+function toggleAllVN() {
+  vnAll = !vnAll;
+  document.querySelectorAll('.sentence-vn').forEach(el => el.classList.toggle('show', vnAll));
+}
+
+// ====== Image toggle ======
+function toggleImg(id) {
+  const box = document.getElementById(id);
+
+  // 👉 check box tồn tại
+  if (!box) {
+    console.error("Không tìm thấy box:", id);
+    return;
+  }
+
+  let img = box.querySelector("img");
+
+  // 👉 nếu chưa có img thì tự tạo luôn
+  if (!img) {
+    img = document.createElement("img");
+    box.appendChild(img);
+  }
+
+  // 👉 lấy số từ id (img-1 → 1)
+  const num = id.match(/\d+/)?.[0];
+
+  const isShow = box.classList.contains("show");
+
+  if (!isShow) {
+    img.src = num + ".jpg";
+    box.classList.add("show");
+  } else {
+    box.classList.remove("show");
+
+    setTimeout(() => {
+      img.src = "";
+    }, 400);
+  }
+}
+// function toggleImg(id) { document.getElementById(id).classList.toggle('show'); }
+// let imgAll = false;
+// function toggleAllImg() {
+//   imgAll = !imgAll;
+//   document.querySelectorAll('.img-box').forEach(el => el.classList.toggle('show', imgAll));
+// }
+
+// ====== Notes toggle ======
+function toggleNotes() {
+  const body = document.getElementById('notes-body');
+  const arrow = document.getElementById('notes-arrow');
+  body.classList.toggle('open');
+  arrow.textContent = body.classList.contains('open') ? '▲' : '▼';
+}
+
+// ====== Confetti ======
+function spawnConfetti(anchor) {
+  const rect = anchor.getBoundingClientRect();
+  const emojis = ['🌟','⭐','🎉','✨','💫','🩹','❤️','🎊'];
+  for (let i = 0; i < 10; i++) {
+    const el = document.createElement('div');
+    el.style.cssText = `
+      position:fixed;pointer-events:none;z-index:9999;
+      left:${rect.left + Math.random()*rect.width}px;
+      top:${rect.top - 10}px;
+      font-size:${1.2 + Math.random()*0.8}rem;
+      animation:confetti ${1+Math.random()*0.5}s ease forwards;
+    `;
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 1600);
+  }
+}
+const cs = document.createElement('style');
+cs.textContent = '@keyframes confetti{0%{opacity:1;transform:translateY(0) scale(1) rotate(0deg);}100%{opacity:0;transform:translateY(-90px) scale(0.3) rotate(360deg);}}';
+document.head.appendChild(cs);
+</script>
+</body>
+</html>
